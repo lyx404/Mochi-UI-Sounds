@@ -5,27 +5,19 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Design system definition.
- *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
- *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
- *
- * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ * Animal Island UI — Design System
+ * Inspired by Animal Crossing visual language.
+ * Warm parchment surfaces, mint-teal accent, pill capsules,
+ * Nintendo-style 3D pixel-stack button press.
  */
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-pill: 50px;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -34,6 +26,9 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
+  --color-primary-soft: var(--primary-soft);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -42,103 +37,177 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-focus: var(--focus);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-ring-offset-background: var(--background);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-muted: var(--ink-muted);
+
+  /* Nookphone palette */
+  --color-leaf: var(--leaf);
+  --color-app-pink: var(--app-pink);
+  --color-app-purple: var(--app-purple);
+  --color-app-blue: var(--app-blue);
+  --color-app-yellow: var(--app-yellow);
+  --color-app-orange: var(--app-orange);
+  --color-app-green: var(--app-green);
+
+  --font-display: "Nunito", "Noto Sans SC", -apple-system, "PingFang SC", sans-serif;
+  --font-sans: "Nunito", "Noto Sans SC", -apple-system, "PingFang SC", sans-serif;
+
+  --shadow-press: 0 5px 0 0 #bdaea0;
+  --shadow-press-hover: 0 6px 0 0 #bdaea0;
+  --shadow-press-active: 0 1px 0 0 #bdaea0;
+  --shadow-card: 0 2px 4px 0 rgba(61, 52, 40, 0.06);
+  --shadow-card-hover: 0 8px 24px rgba(114, 93, 66, 0.15);
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.984 0.003 247.858);
-  --sidebar-foreground: oklch(0.129 0.042 264.695);
-  --sidebar-primary: oklch(0.208 0.042 265.755);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.968 0.007 247.896);
-  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
-  --sidebar-border: oklch(0.929 0.013 255.508);
-  --sidebar-ring: oklch(0.704 0.04 256.788);
-}
+  --radius: 20px;
 
-.dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.208 0.042 265.755);
-  --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
+  --background: oklch(0.975 0.018 95);          /* #f8f8f0 parchment */
+  --foreground: oklch(0.42 0.05 60);            /* #725d42 body */
+  --ink: oklch(0.4 0.06 55);                    /* #794f27 heading */
+  --ink-soft: oklch(0.42 0.05 60);              /* body */
+  --ink-muted: oklch(0.62 0.03 70);             /* #9f927d */
+
+  --card: oklch(0.965 0.025 92);                /* rgb(247,243,223) */
+  --card-foreground: oklch(0.42 0.05 60);
+  --popover: oklch(0.965 0.025 92);
+  --popover-foreground: oklch(0.42 0.05 60);
+
+  --primary: oklch(0.78 0.13 190);              /* #19c8b9 mint teal */
+  --primary-foreground: oklch(1 0 0);
+  --primary-hover: oklch(0.82 0.12 190);        /* #3dd4c6 */
+  --primary-active: oklch(0.72 0.13 190);       /* #11a89b */
+  --primary-soft: oklch(0.96 0.04 190);         /* #e6f9f6 */
+
+  --secondary: oklch(0.93 0.03 90);
+  --secondary-foreground: oklch(0.42 0.05 60);
+  --muted: oklch(0.93 0.03 90);
+  --muted-foreground: oklch(0.62 0.03 70);
+  --accent: oklch(0.96 0.04 190);
+  --accent-foreground: oklch(0.42 0.05 60);
+
+  --success: oklch(0.72 0.18 130);              /* #6fba2c */
+  --warning: oklch(0.84 0.17 90);               /* #f5c31c */
+  --destructive: oklch(0.65 0.18 25);           /* #e05a5a */
+  --destructive-foreground: oklch(1 0 0);
+  --focus: oklch(0.86 0.18 90);                 /* #ffcc00 */
+
+  --border: oklch(0.78 0.03 75);                /* #c4b89e */
+  --border-strong: oklch(0.62 0.03 70);         /* #9f927d */
+  --input: oklch(0.78 0.03 75);
+  --ring: oklch(0.86 0.18 90);
+
+  /* Nookphone palette */
+  --leaf: oklch(0.78 0.13 150);                 /* #7DC395 */
+  --app-pink: oklch(0.78 0.12 15);              /* #f8a6b2 */
+  --app-purple: oklch(0.68 0.18 310);           /* #b77dee */
+  --app-blue: oklch(0.7 0.13 270);              /* #889df0 */
+  --app-yellow: oklch(0.85 0.14 85);            /* #f7cd67 */
+  --app-orange: oklch(0.78 0.15 50);
+  --app-green: oklch(0.82 0.13 145);
+
+  /* shadcn sidebar (kept for compatibility) */
+  --sidebar: var(--card);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
 }
 
 @layer base {
   * {
     border-color: var(--color-border);
   }
-
-  body {
-    background-color: var(--color-background);
+  html, body {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    letter-spacing: 0.01em;
     color: var(--color-foreground);
+    background-color: var(--color-background);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(121, 79, 39, 0.06) 1px, transparent 0);
+    background-size: 24px 24px;
   }
+  h1, h2, h3, h4 {
+    font-weight: 800;
+    color: var(--color-ink);
+    letter-spacing: -0.01em;
+  }
+}
+
+/* ===== Animal Island custom utilities ===== */
+
+@utility ai-press {
+  /* Nintendo 3D button press */
+  box-shadow: var(--shadow-press);
+  transform: translateZ(0);
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  &:hover {
+    box-shadow: var(--shadow-press-hover);
+    transform: translateY(-1px);
+  }
+  &:active {
+    box-shadow: var(--shadow-press-active);
+    transform: translateY(3px);
+  }
+}
+
+@utility ai-press-danger {
+  box-shadow: 0 5px 0 0 #c94444;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  &:hover { box-shadow: 0 6px 0 0 #c94444; transform: translateY(-1px); }
+  &:active { box-shadow: 0 1px 0 0 #c94444; transform: translateY(3px); }
+}
+
+@utility ai-press-yellow {
+  box-shadow: 0 5px 0 0 #e0b800;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  &:hover { box-shadow: 0 6px 0 0 #e0b800; transform: translateY(-1px); }
+  &:active { box-shadow: 0 1px 0 0 #e0b800; transform: translateY(3px); }
+}
+
+@utility ai-card {
+  background: var(--color-card);
+  border: 2px solid var(--color-border-strong);
+  border-radius: 20px;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card-hover);
+  }
+}
+
+@utility ai-pill {
+  border-radius: 50px;
+  border: 2px solid var(--color-border-strong);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+@utility ai-ribbon {
+  /* Swallowtail banner clip-path */
+  clip-path: polygon(
+    4% 0%, 96% 0%,
+    100% 50%, 96% 100%,
+    4% 100%, 0% 50%
+  );
+}
+
+@utility ai-leaf-bg {
+  background-color: var(--color-leaf);
+  background-image:
+    radial-gradient(ellipse 60px 30px at 20% 30%, rgba(255,255,255,0.18), transparent 60%),
+    radial-gradient(ellipse 80px 40px at 80% 70%, rgba(255,255,255,0.12), transparent 60%),
+    radial-gradient(ellipse 50px 25px at 50% 90%, rgba(0,0,0,0.06), transparent 70%);
 }
