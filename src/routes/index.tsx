@@ -1,6 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  Bell, CheckSquare, ChevronDown, CircleDot, Coins, Copy, Hand, Keyboard,
+  Layers, Leaf, List, Mail, MessageCircle, MousePointer, MousePointerClick,
+  Music, SlidersHorizontal, Star, ToggleRight, TrendingUp, Unlock, Wind, Zap,
+} from "lucide-react";
+import {
   setSoundVolume,
   sounds,
   sourceForTheme,
@@ -29,15 +34,7 @@ export const Route = createFileRoute("/")({
 });
 
 type Language = "zh" | "en";
-type SoundCategory =
-  | "all"
-  | "basic"
-  | "form"
-  | "navigation"
-  | "state"
-  | "system"
-  | "motion"
-  | "reward";
+type SoundCategory = "all" | "click" | "controls" | "system" | "reward";
 type SoundMeta = {
   id: string;
   names: [SoundName, ...SoundName[]];
@@ -47,6 +44,16 @@ type SoundMeta = {
   color: "mint" | "pink" | "yellow" | "blue" | "purple" | "green";
 };
 type StyledSelectOption = { value: string; label: string };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const SOUND_ICONS: Record<string, React.ComponentType<any>> = {
+  click: MousePointerClick, tap: Hand, pop: Zap, hover: MousePointer,
+  switch: ToggleRight, unlock: Unlock, notification: Bell, message: Mail,
+  surface: Layers, bubble: MessageCircle, coin: Coins,
+  levelUp: TrendingUp, chime: Music, drop: Leaf, type: Keyboard,
+  slider: SlidersHorizontal, checkbox: CheckSquare, radio: CircleDot,
+  tab: List, dropdown: ChevronDown,
+};
 
 const LIBRARY: SoundMeta[] = [
   { id: "click", names: ["click"], label: "Click", emoji: "👆", hint: "Primary button press", color: "mint" },
@@ -61,7 +68,6 @@ const LIBRARY: SoundMeta[] = [
   { id: "message", names: ["message"], label: "Message", emoji: "💌", hint: "New message arrived", color: "purple" },
 
   { id: "surface", names: ["open", "close"], label: "Modal", emoji: "📂", hint: "Modal or drawer state changes", color: "mint" },
-  { id: "whoosh", names: ["whoosh"], label: "Whoosh", emoji: "💨", hint: "Sheet slides in", color: "purple" },
   { id: "bubble", names: ["bubble"], label: "Bubble", emoji: "🐠", hint: "Tooltip appears", color: "blue" },
 
   { id: "coin", names: ["coin"], label: "Coin", emoji: "🪙", hint: "Reward earned", color: "yellow" },
@@ -78,48 +84,24 @@ const LIBRARY: SoundMeta[] = [
 ];
 
 const SOUND_CATEGORY_BY_NAME: Record<SoundName, Exclude<SoundCategory, "all">> = {
-  click: "basic",
-  tap: "basic",
-  pop: "basic",
-  hover: "basic",
-  type: "basic",
-  slider: "form",
-  snap: "form",
-  check: "form",
-  uncheck: "form",
-  radio: "form",
-  tab: "navigation",
-  menuOpen: "navigation",
-  select: "navigation",
-  toggleOn: "state",
-  toggleOff: "state",
-  unlock: "state",
-  success: "system",
-  error: "system",
-  notify: "system",
-  message: "system",
-  open: "motion",
-  close: "motion",
-  whoosh: "motion",
-  bubble: "motion",
-  drop: "motion",
-  coin: "reward",
-  levelUp: "reward",
-  chime: "reward",
+  click: "click", tap: "click", pop: "click", hover: "click", type: "click",
+  slider: "controls", snap: "controls", check: "controls", uncheck: "controls",
+  radio: "controls", tab: "controls", menuOpen: "controls", select: "controls",
+  toggleOn: "controls", toggleOff: "controls", unlock: "controls",
+  success: "system", error: "system", notify: "system", message: "system",
+  open: "system", close: "system", bubble: "system", drop: "system",
+  coin: "reward", levelUp: "reward", chime: "reward",
 };
 
 const SOUND_CATEGORIES: Array<{
   value: SoundCategory;
   label: Record<Language, string>;
 }> = [
-  { value: "all", label: { zh: "全部组件", en: "All components" } },
-  { value: "basic", label: { zh: "基础反馈", en: "Basic feedback" } },
-  { value: "form", label: { zh: "表单控件", en: "Form controls" } },
-  { value: "navigation", label: { zh: "导航菜单", en: "Navigation menus" } },
-  { value: "state", label: { zh: "开关状态", en: "Switch states" } },
-  { value: "system", label: { zh: "系统提示", en: "System prompts" } },
-  { value: "motion", label: { zh: "界面动效", en: "Interface motion" } },
-  { value: "reward", label: { zh: "奖励反馈", en: "Reward feedback" } },
+  { value: "all",      label: { zh: "全部",     en: "All" } },
+  { value: "click",    label: { zh: "点击",     en: "Click" } },
+  { value: "controls", label: { zh: "控件",     en: "Controls" } },
+  { value: "system",   label: { zh: "系统",     en: "System" } },
+  { value: "reward",   label: { zh: "奖励",     en: "Reward" } },
 ];
 
 const COPY = {
@@ -208,7 +190,6 @@ const COMPONENT_COPY: Record<Language, Record<string, { label: string; hint: str
     notification: { label: "通知", hint: "通知、成功与错误提示" },
     message: { label: "消息", hint: "新消息到达" },
     surface: { label: "弹层", hint: "弹窗或抽屉打开/关闭" },
-    whoosh: { label: "掠过", hint: "面板滑入" },
     bubble: { label: "气泡", hint: "提示浮层出现" },
     coin: { label: "金币", hint: "获得奖励" },
     levelUp: { label: "升级", hint: "达成里程碑" },
@@ -414,49 +395,52 @@ function SoundCard({
     <article
       onMouseEnter={meta.names.includes("hover") ? () => onPlay("hover") : undefined}
       className={[
-        "ai-card group relative overflow-hidden p-5 pr-14",
+        "ai-card group relative p-5",
         c.bg,
       ].join(" ")}
     >
-      <button
-        onClick={() => onCopy(primaryName)}
-        aria-label={copy.copyThemeCode}
-        title={copy.copyThemeCode}
-        className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full border-2 border-[var(--color-border-strong)] bg-white text-sm font-black text-[var(--color-ink)] shadow-[0_2px_4px_rgba(61,52,40,0.08)] transition-transform hover:-translate-y-0.5"
-      >
-        {isCopied ? "✓" : "⧉"}
-      </button>
-
-      <div className="flex items-start gap-4">
-        <button
-          onClick={() => onPlay(primaryName)}
-          aria-label={`${copy.playPrefix} ${componentCopy.label}`}
+      {/* Compact header: icon + title + copy button in one row */}
+      <div className="flex items-center gap-3">
+        <div
           className={[
-            "relative grid h-16 w-16 shrink-0 place-items-center rounded-2xl border-2 border-[var(--color-border-strong)] text-3xl transition-transform hover:-translate-y-0.5 active:translate-y-0.5",
+            "grid h-9 w-9 shrink-0 place-items-center rounded-xl border-2 border-[var(--color-border-strong)]",
             c.emoji,
           ].join(" ")}
         >
-          <span className={componentIsPlaying ? "animate-bounce" : ""}>{meta.emoji}</span>
+          <SoundIcon id={meta.id} />
           {componentIsPlaying && <Ripples />}
-        </button>
-
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-            <h3 className="text-lg font-black text-[var(--color-ink)]">{componentCopy.label}</h3>
-            <span className="break-all font-mono text-[11px] text-[var(--color-ink-muted)]">
-              {meta.names
-                .map((name) => `play${name[0].toUpperCase()}${name.slice(1)}()`)
-                .join(" / ")}
-            </span>
-          </div>
-          <p className="mt-0.5 text-sm text-[var(--color-ink-soft)]">{componentCopy.hint}</p>
-          <ComponentPreview
-            id={meta.id}
-            language={language}
-            playing={componentIsPlaying}
-            onPlay={handlePreviewPlay}
-          />
         </div>
+
+        <h3 className="min-w-0 flex-1 text-base font-black text-[var(--color-ink)]">{componentCopy.label}</h3>
+
+        <button
+          onClick={() => onCopy(primaryName)}
+          aria-label={copy.copyThemeCode}
+          className="flex shrink-0 items-center gap-1.5 rounded-full border-2 border-[var(--color-border-strong)] bg-white px-2.5 py-1 text-xs font-black text-[var(--color-ink)] shadow-[0_2px_4px_rgba(61,52,40,0.08)] transition-transform hover:-translate-y-0.5"
+        >
+          {isCopied ? <span className="text-[var(--color-primary-active)]">✓</span> : <Copy size={12} strokeWidth={2.5} />}
+          <span>{isCopied ? (language === "zh" ? "已复制" : "Copied") : (language === "zh" ? "复制代码" : "Copy code")}</span>
+        </button>
+      </div>
+
+      {/* Secondary info: API name + hint */}
+      <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <span className="break-all font-mono text-[10px] font-bold uppercase text-[var(--color-ink-muted)]">
+          {meta.names
+            .map((name) => `play${name[0].toUpperCase()}${name.slice(1)}()`)
+            .join(" / ")}
+        </span>
+        <p className="text-xs text-[var(--color-ink-soft)]">{componentCopy.hint}</p>
+      </div>
+
+      {/* Trigger area with minimum height */}
+      <div className="mt-4">
+        <ComponentPreview
+          id={meta.id}
+          language={language}
+          playing={componentIsPlaying}
+          onPlay={handlePreviewPlay}
+        />
       </div>
     </article>
   );
@@ -493,32 +477,43 @@ function ComponentPreview({
 
   if (id === "slider") {
     return (
-      <div className="mt-4 rounded-2xl bg-white/35 p-3">
-        <div className="mb-2 flex items-center justify-between text-[11px] font-black uppercase text-[var(--color-ink-muted)]">
+      <div className="mt-4">
+        <div className="mb-3 flex items-center justify-between text-[11px] font-black uppercase text-[var(--color-ink-muted)]">
           <span>{language === "zh" ? "数值" : "Value"}</span>
-          <span>{sliderValue}</span>
+          <span className="text-[var(--color-primary-active)]">{sliderValue}</span>
         </div>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          step="5"
-          value={sliderValue}
-          onChange={(event) => {
-            const next = Number(event.target.value);
-            setSliderValue(next);
-            onPlay(next % 10 === 0 ? "snap" : "slider");
-          }}
-          className="h-2 w-full cursor-pointer accent-[var(--color-primary)]"
-          aria-label={language === "zh" ? "滑动条预览" : "Slider preview"}
-        />
+        {/* AntD-style custom slider: filled track + thumb */}
+        <div className="relative flex h-4 cursor-pointer items-center">
+          <div className="absolute h-1.5 w-full rounded-full bg-[var(--color-border)]" />
+          <div
+            className="absolute h-1.5 rounded-full bg-[var(--color-primary)]"
+            style={{ width: `${sliderValue}%` }}
+          />
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={sliderValue}
+            onChange={(event) => {
+              const next = Number(event.target.value);
+              setSliderValue(next);
+              onPlay("slider");
+            }}
+            className="absolute h-4 w-full cursor-pointer opacity-0"
+            aria-label={language === "zh" ? "滑动条预览" : "Slider preview"}
+          />
+          <div
+            className="absolute h-4 w-4 rounded-full border-2 border-[var(--color-border-strong)] bg-white shadow-sm transition-none"
+            style={{ left: `calc(${sliderValue}% - 8px)` }}
+          />
+        </div>
       </div>
     );
   }
 
   if (id === "checkbox") {
     return (
-      <div className="mt-4 flex items-center justify-between rounded-2xl bg-white/35 p-3">
+      <div className="mt-4 flex items-center justify-between">
         <button
           type="button"
           onClick={() => {
@@ -549,7 +544,7 @@ function ComponentPreview({
 
   if (id === "switch") {
     return (
-      <div className="mt-4 flex items-center justify-between rounded-2xl bg-white/35 p-3">
+      <div className="mt-4 flex items-center justify-between">
         <span className="text-sm font-black text-[var(--color-ink)]">
           {language === "zh" ? "自动播放" : "Auto play"}
         </span>
@@ -562,14 +557,18 @@ function ComponentPreview({
             onPlay(next ? "toggleOn" : "toggleOff");
           }}
           className={[
-            "relative h-8 w-14 rounded-full border-2 border-[var(--color-border-strong)] transition-colors",
+            "relative h-7 w-14 overflow-hidden rounded-full border-2 border-[var(--color-border-strong)] transition-colors",
             switchOn ? "bg-[var(--color-primary)]" : "bg-white",
           ].join(" ")}
         >
+          <span className={["absolute inset-y-0 flex items-center text-[10px] font-black transition-all",
+            switchOn ? "left-2 text-white" : "right-1.5 text-[var(--color-ink-muted)]"].join(" ")}>
+            {switchOn ? (language === "zh" ? "开" : "On") : (language === "zh" ? "关" : "Off")}
+          </span>
           <span
             className={[
-              "absolute top-1 h-5 w-5 rounded-full border-2 border-[var(--color-border-strong)] bg-white transition-transform",
-              switchOn ? "translate-x-6" : "translate-x-1",
+              "absolute top-0.5 h-5 w-5 rounded-full border-2 border-[var(--color-border-strong)] bg-white transition-transform",
+              switchOn ? "translate-x-[30px]" : "translate-x-0.5",
             ].join(" ")}
           />
         </button>
@@ -583,31 +582,30 @@ function ComponentPreview({
       icon: string;
       zh: string;
       en: string;
-      color: string;
+      accent: string;
     }> = [
-      { name: "notify", icon: "i", zh: "通知提示", en: "Info Toast", color: "text-blue-500" },
-      { name: "success", icon: "✓", zh: "成功提示", en: "Success Toast", color: "text-emerald-600" },
-      { name: "error", icon: "×", zh: "错误提示", en: "Error Toast", color: "text-rose-500" },
+      { name: "notify",  icon: "ℹ", zh: "通知提示", en: "Info",    accent: "bg-blue-400" },
+      { name: "success", icon: "✓", zh: "操作成功", en: "Success", accent: "bg-emerald-500" },
+      { name: "error",   icon: "✕", zh: "出错了",   en: "Error",   accent: "bg-rose-400" },
     ];
 
     return (
-      <div className="mt-4 space-y-2 rounded-2xl bg-white/35 p-2">
+      <div className="mt-4 space-y-2">
         {toasts.map((toast) => (
           <button
             key={toast.name}
             type="button"
             onClick={() => onPlay(toast.name)}
-            className="flex w-full items-center gap-3 rounded-xl border-2 border-white/70 bg-white/75 px-3 py-2 text-left text-xs font-black text-[var(--color-ink)] transition-transform hover:-translate-y-0.5"
+            className="flex w-full items-stretch overflow-hidden rounded-xl border-2 border-[var(--color-border-strong)] bg-white text-left text-xs transition-transform hover:-translate-y-0.5"
           >
-            <span
-              className={[
-                "grid h-6 w-6 place-items-center rounded-full border-2 bg-white text-sm leading-none",
-                toast.color,
-              ].join(" ")}
-            >
+            {/* left color accent bar — AntD notification style */}
+            <span className={["w-1 shrink-0", toast.accent].join(" ")} />
+            <span className={["grid h-8 w-8 shrink-0 place-items-center text-sm font-black", toast.accent.replace("bg-", "text-")].join(" ")}>
               {toast.icon}
             </span>
-            <span>{language === "zh" ? toast.zh : toast.en}</span>
+            <span className="flex flex-1 items-center py-1.5 pr-3 font-black text-[var(--color-ink)]">
+              {language === "zh" ? toast.zh : toast.en}
+            </span>
           </button>
         ))}
       </div>
@@ -616,7 +614,7 @@ function ComponentPreview({
 
   if (id === "surface") {
     return (
-      <div className="mt-4 rounded-2xl bg-white/35 p-3">
+      <div className="mt-4">
         <button
           type="button"
           onClick={() => {
@@ -649,7 +647,7 @@ function ComponentPreview({
 
   if (id === "radio") {
     return (
-      <div className="mt-4 flex gap-2 rounded-2xl bg-white/35 p-3">
+      <div className="mt-4 flex gap-2">
         {["a", "b"].map((value) => (
           <button
             key={value}
@@ -673,24 +671,31 @@ function ComponentPreview({
 
   if (id === "tab") {
     return (
-      <div className="mt-4 rounded-2xl bg-white/35 p-2">
-        <div className="grid grid-cols-2 gap-2">
+      <div className="mt-4">
+        <div className="flex border-b-2 border-[var(--color-border)]">
           {["a", "b"].map((value) => (
             <button
               key={value}
               type="button"
-              onClick={() => {
-                setActiveTab(value);
-                onPlay("tab");
-              }}
+              onClick={() => { setActiveTab(value); onPlay("tab"); }}
               className={[
-                "rounded-full border-2 border-[var(--color-border-strong)] px-3 py-1.5 text-xs font-black",
-                activeTab === value ? "bg-[var(--color-primary)] text-white" : "bg-white text-[var(--color-ink)]",
+                "relative px-4 pb-2 text-xs font-black transition-colors",
+                activeTab === value
+                  ? "text-[var(--color-primary-active)]"
+                  : "text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]",
               ].join(" ")}
             >
               {value === "a" ? (language === "zh" ? "总览" : "Overview") : (language === "zh" ? "详情" : "Details")}
+              {activeTab === value && (
+                <span className="absolute bottom-[-2px] left-0 right-0 h-0.5 rounded-full bg-[var(--color-primary-active)]" />
+              )}
             </button>
           ))}
+        </div>
+        <div className="pt-2 text-xs text-[var(--color-ink-muted)]">
+          {activeTab === "a"
+            ? (language === "zh" ? "— 总览内容 —" : "— Overview content —")
+            : (language === "zh" ? "— 详情内容 —" : "— Detail content —")}
         </div>
       </div>
     );
@@ -698,7 +703,7 @@ function ComponentPreview({
 
   if (id === "dropdown") {
     return (
-      <div className="relative mt-4 rounded-2xl bg-white/35 p-3">
+      <div className="relative mt-4">
         <button
           type="button"
           onClick={() => {
@@ -737,15 +742,13 @@ function ComponentPreview({
 
   if (id === "click") {
     return (
-      <div className="mt-4 rounded-2xl bg-white/35 p-3">
-        <button
-          type="button"
-          onClick={() => onPlay("click")}
-          className="w-full rounded-full border-2 border-[var(--color-border-strong)] bg-[var(--color-primary)] px-4 py-2 text-sm font-black text-white transition-transform hover:-translate-y-0.5 active:translate-y-0.5"
-        >
-          {language === "zh" ? "确认操作" : "Confirm"}
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={() => onPlay("click")}
+        className="mt-4 w-full rounded-full bg-[var(--color-primary)] px-4 py-2 text-sm font-black text-white transition-transform hover:-translate-y-0.5 active:translate-y-0.5"
+      >
+        {language === "zh" ? "确认操作" : "Confirm"}
+      </button>
     );
   }
 
@@ -754,7 +757,7 @@ function ComponentPreview({
       <button
         type="button"
         onClick={() => onPlay("tap")}
-        className="mt-4 flex w-full items-center justify-between rounded-2xl bg-white/45 px-3 py-2 text-left text-sm font-black text-[var(--color-ink)] transition-transform hover:-translate-y-0.5"
+        className="mt-4 flex w-full items-center justify-between py-2 text-left text-sm font-black text-[var(--color-ink)] transition-transform hover:-translate-y-0.5"
       >
         <span>{language === "zh" ? "列表项目" : "List item"}</span>
         <span className="text-[var(--color-ink-muted)]">›</span>
@@ -764,22 +767,21 @@ function ComponentPreview({
 
   if (id === "pop") {
     return (
-      <div className="mt-4 rounded-2xl bg-white/35 p-3">
-        <button
-          type="button"
-          onClick={() => {
-            setPopPressed(true);
-            onPlay("pop");
-            window.setTimeout(() => setPopPressed(false), 180);
-          }}
-          className={[
-            "mx-auto grid h-12 w-12 place-items-center rounded-2xl border-2 border-[var(--color-border-strong)] bg-white text-2xl transition-transform",
-            popPressed ? "scale-110" : "hover:scale-105",
-          ].join(" ")}
-        >
-          🫧
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={() => {
+          setPopPressed(true);
+          onPlay("pop");
+          window.setTimeout(() => setPopPressed(false), 180);
+        }}
+        className={[
+          "mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-[var(--color-border-strong)] bg-white py-3 text-sm font-black text-[var(--color-ink)] transition-transform",
+          popPressed ? "scale-[1.03]" : "hover:scale-[1.01]",
+        ].join(" ")}
+      >
+        <Zap size={16} strokeWidth={2.2} />
+        {language === "zh" ? "弹一下" : "Pop it"}
+      </button>
     );
   }
 
@@ -787,7 +789,7 @@ function ComponentPreview({
     return (
       <div
         onMouseEnter={() => onPlay("hover")}
-        className="mt-4 rounded-2xl border-2 border-dashed border-[var(--color-border-strong)] bg-white/35 px-3 py-3 text-center text-xs font-black text-[var(--color-ink)]"
+        className="mt-4 rounded-2xl border-2 border-dashed border-[var(--color-border-strong)] px-3 py-3 text-center text-xs font-black text-[var(--color-ink)]"
       >
         {language === "zh" ? "悬停到这里" : "Hover here"}
       </div>
@@ -796,21 +798,16 @@ function ComponentPreview({
 
   if (id === "unlock") {
     return (
-      <div className="mt-4 flex items-center justify-between rounded-2xl bg-white/35 p-3">
+      <button
+        type="button"
+        onClick={() => { setUnlocked(true); onPlay("unlock"); }}
+        className="mt-4 flex w-full items-center justify-between transition-transform hover:-translate-y-0.5"
+      >
         <span className="text-sm font-black text-[var(--color-ink)]">
           {unlocked ? (language === "zh" ? "已解锁" : "Unlocked") : (language === "zh" ? "权限锁定" : "Locked")}
         </span>
-        <button
-          type="button"
-          onClick={() => {
-            setUnlocked(true);
-            onPlay("unlock");
-          }}
-          className="rounded-full border-2 border-[var(--color-border-strong)] bg-white px-3 py-1.5 text-xs font-black text-[var(--color-ink)] transition-transform hover:-translate-y-0.5"
-        >
-          🔓
-        </button>
-      </div>
+        <Unlock size={14} strokeWidth={2.2} />
+      </button>
     );
   }
 
@@ -822,9 +819,9 @@ function ComponentPreview({
           setMessageRead((current) => !current);
           onPlay("message");
         }}
-        className="mt-4 flex w-full items-center gap-3 rounded-2xl bg-white/40 p-3 text-left"
+        className="mt-4 flex w-full items-center gap-3 text-left"
       >
-        <span className="grid h-8 w-8 place-items-center rounded-full bg-white text-lg">💌</span>
+        <span className="grid h-8 w-8 place-items-center rounded-full bg-white"><Mail size={16} strokeWidth={2.2} /></span>
         <span className="min-w-0 flex-1">
           <span className="block text-sm font-black text-[var(--color-ink)]">
             {language === "zh" ? "新消息" : "New message"}
@@ -839,7 +836,7 @@ function ComponentPreview({
 
   if (id === "whoosh") {
     return (
-      <div className="mt-4 rounded-2xl bg-white/35 p-3">
+      <div className="mt-4">
         <button
           type="button"
           onClick={() => {
@@ -862,7 +859,7 @@ function ComponentPreview({
 
   if (id === "bubble") {
     return (
-      <div className="relative mt-4 rounded-2xl bg-white/35 p-3 text-center">
+      <div className="relative mt-4 text-center">
         <button
           type="button"
           onMouseEnter={() => {
@@ -873,7 +870,7 @@ function ComponentPreview({
             setTooltipVisible((current) => !current);
             onPlay("bubble");
           }}
-          className="rounded-full border-2 border-[var(--color-border-strong)] bg-white px-3 py-1.5 text-xs font-black text-[var(--color-ink)]"
+          className="w-full rounded-full border-2 border-[var(--color-border-strong)] bg-white px-3 py-1.5 text-xs font-black text-[var(--color-ink)]"
         >
           {language === "zh" ? "提示目标" : "Tooltip target"}
         </button>
@@ -888,39 +885,33 @@ function ComponentPreview({
 
   if (id === "coin") {
     return (
-      <div className="mt-4 flex items-center justify-between rounded-2xl bg-white/35 p-3">
-        <span className="text-sm font-black text-[var(--color-ink)]">🪙 {coinCount}</span>
-        <button
-          type="button"
-          onClick={() => {
-            setCoinCount((count) => count + 1);
-            onPlay("coin");
-          }}
-          className="rounded-full border-2 border-[var(--color-border-strong)] bg-white px-3 py-1.5 text-xs font-black text-[var(--color-ink)]"
-        >
+      <button
+        type="button"
+        onClick={() => { setCoinCount((c) => c + 1); onPlay("coin"); }}
+        className="mt-4 flex w-full items-center justify-between transition-transform hover:-translate-y-0.5"
+      >
+        <span className="flex items-center gap-1.5 text-sm font-black text-[var(--color-ink)]"><Coins size={15} strokeWidth={2.2} /> {coinCount}</span>
+        <span className="rounded-full border-2 border-[var(--color-border-strong)] bg-white px-3 py-1 text-xs font-black text-[var(--color-ink)]">
           {language === "zh" ? "领取" : "Claim"}
-        </button>
-      </div>
+        </span>
+      </button>
     );
   }
 
   if (id === "levelUp") {
     return (
-      <div className="mt-4 flex items-center justify-between rounded-2xl bg-white/35 p-3">
+      <button
+        type="button"
+        onClick={() => { setLevel((l) => l + 1); onPlay("levelUp"); }}
+        className="mt-4 flex w-full items-center justify-between transition-transform hover:-translate-y-0.5"
+      >
         <span className="text-sm font-black text-[var(--color-ink)]">
           {language === "zh" ? `等级 ${level}` : `Level ${level}`}
         </span>
-        <button
-          type="button"
-          onClick={() => {
-            setLevel((current) => current + 1);
-            onPlay("levelUp");
-          }}
-          className="rounded-full border-2 border-[var(--color-border-strong)] bg-white px-3 py-1.5 text-xs font-black text-[var(--color-ink)]"
-        >
-          ⭐
-        </button>
-      </div>
+        <span className="rounded-full border-2 border-[var(--color-border-strong)] bg-white px-3 py-1 text-xs font-black text-[var(--color-ink)]">
+          <Star size={14} strokeWidth={2.2} />
+        </span>
+      </button>
     );
   }
 
@@ -929,34 +920,32 @@ function ComponentPreview({
       <button
         type="button"
         onClick={() => onPlay("chime")}
-        className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-white/35 px-3 py-3 text-sm font-black text-[var(--color-ink)] transition-transform hover:-translate-y-0.5"
+        className="mt-4 flex w-full items-center justify-center gap-2 text-sm font-black text-[var(--color-ink)] transition-transform hover:-translate-y-0.5"
       >
-        🎐 {language === "zh" ? "轻敲风铃" : "Ring chime"}
+        <Music size={16} strokeWidth={2.2} /> {language === "zh" ? "轻敲风铃" : "Ring chime"}
       </button>
     );
   }
 
   if (id === "drop") {
     return (
-      <div className="mt-4 rounded-2xl bg-white/35 p-3">
-        <button
-          type="button"
-          onClick={() => {
-            setDropped((current) => !current);
-            onPlay("drop");
-          }}
-          className="relative h-12 w-full rounded-2xl border-2 border-dashed border-[var(--color-border-strong)] bg-white/60"
+      <button
+        type="button"
+        onClick={() => {
+          setDropped((current) => !current);
+          onPlay("drop");
+        }}
+        className="relative mt-4 h-12 w-full rounded-2xl border-2 border-dashed border-[var(--color-border-strong)] bg-white/60"
+      >
+        <span
+          className={[
+            "absolute left-1/2 -translate-x-1/2 transition-all",
+            dropped ? "top-5" : "top-1",
+          ].join(" ")}
         >
-          <span
-            className={[
-              "absolute left-1/2 text-xl transition-all",
-              dropped ? "top-5 -translate-x-1/2" : "top-1 -translate-x-1/2",
-            ].join(" ")}
-          >
-            🍃
-          </span>
-        </button>
-      </div>
+          <Leaf size={20} strokeWidth={2.2} />
+        </span>
+      </button>
     );
   }
 
@@ -1160,6 +1149,11 @@ function StyledSelect({
       )}
     </div>
   );
+}
+
+function SoundIcon({ id }: { id: string }) {
+  const Icon = SOUND_ICONS[id];
+  return Icon ? <Icon size={28} strokeWidth={2.2} /> : null;
 }
 
 function Ripples() {
