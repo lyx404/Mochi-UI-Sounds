@@ -2,6 +2,8 @@
 
 [中文](#中文) | [English](#english)
 
+[Live Preview](https://mochi-ui-sounds.vercel.app)
+
 ## 中文
 
 Mochi UI Sounds 是一个轻量的 Web Audio UI 音效库，并打包成了通用 AI agent
