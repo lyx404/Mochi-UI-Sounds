@@ -1,0 +1,4 @@
+interface:
+  display_name: "Mochi UI Sounds"
+  short_description: "Install cozy Web Audio UI sounds"
+  default_prompt: "Use $mochi-ui-sounds to add playful UI interaction sounds to this app."
