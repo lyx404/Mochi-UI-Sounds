@@ -27,6 +27,13 @@ export function getCtx(): AudioContext {
 }
 
 type Wave = OscillatorType;
+const TYPE_SCALE = [880, 988, 1108.73, 1174.66, 1318.51, 1479.98, 1661.22, 1760];
+
+function typeFreq(step = 0, octave = 1) {
+  const note = TYPE_SCALE[Math.abs(step) % TYPE_SCALE.length];
+  const octaveOffset = Math.floor(Math.abs(step) / TYPE_SCALE.length);
+  return note * octave * 2 ** Math.min(octaveOffset, 1);
+}
 
 function tone(opts: {
   freq: number;
@@ -49,8 +56,8 @@ function tone(opts: {
     osc.frequency.exponentialRampToValueAtTime(opts.glideTo, t0 + opts.duration);
   }
   const peak = (opts.gain ?? 0.18) * _volume;
-  const a = opts.attack ?? 0.005;
-  const r = opts.release ?? 0.08;
+  const a = Math.min(opts.attack ?? 0.005, opts.duration * 0.4);
+  const r = Math.min(opts.release ?? 0.08, opts.duration - a);
   g.gain.setValueAtTime(0, t0);
   g.gain.linearRampToValueAtTime(peak, t0 + a);
   g.gain.linearRampToValueAtTime(peak, t0 + opts.duration - r);
@@ -195,11 +202,41 @@ export const sounds = {
       tone({ freq: f, duration: 0.6, type: "sine", gain: 0.12, release: 0.5, delay: i * 0.04 }),
     );
   },
+
+  rain: () => {
+    noiseBurst(0.65, 0.045, 1800);
+    noiseBurst(0.28, 0.018, 5200);
+  },
+
+  wind: () => {
+    noiseBurst(0.72, 0.04, 760);
+    tone({ freq: 180, glideTo: 260, duration: 0.5, type: "sine", gain: 0.045, release: 0.32 });
+  },
+
+  storm: () => {
+    noiseBurst(0.72, 0.055, 1200);
+    tone({ freq: 86, glideTo: 48, duration: 0.42, type: "sawtooth", gain: 0.075, release: 0.28 });
+    tone({ freq: 172, glideTo: 92, duration: 0.28, type: "triangle", gain: 0.05, delay: 0.08, release: 0.18 });
+  },
 } as const;
 
 export type SoundName = keyof typeof sounds;
 
-function playSoftFeedback(name: SoundName) {
+function playTypeNote(theme: SoundThemeName, step = 0) {
+  if (theme === "pixel") {
+    tone({ freq: typeFreq(step, 1.15), duration: 0.018, type: "square", gain: 0.06, release: 0.008 });
+    return;
+  }
+
+  if (theme === "clearChime") {
+    tone({ freq: typeFreq(step, 1.05), duration: 0.045, type: "sine", gain: 0.055, release: 0.03 });
+    return;
+  }
+
+  tone({ freq: typeFreq(step, 0.72), duration: 0.032, type: "triangle", gain: 0.07, release: 0.018 });
+}
+
+function playSoftFeedback(name: SoundName, step?: number) {
   switch (name) {
     case "click":
       tone({ freq: 340, glideTo: 520, duration: 0.08, type: "sine", gain: 0.18, release: 0.05 });
@@ -234,8 +271,9 @@ function playSoftFeedback(name: SoundName) {
       );
       break;
     case "error":
-      tone({ freq: 260, glideTo: 180, duration: 0.18, type: "sawtooth", gain: 0.13 });
-      noiseBurst(0.11, 0.035, 700);
+      tone({ freq: 880, glideTo: 740, duration: 0.075, type: "triangle", gain: 0.095, release: 0.045 });
+      tone({ freq: 622.25, duration: 0.1, type: "triangle", gain: 0.085, delay: 0.075, release: 0.065 });
+      noiseBurst(0.035, 0.012, 4200);
       break;
     case "notify":
       tone({ freq: 880, duration: 0.11, type: "sine", gain: 0.12, release: 0.08 });
@@ -309,12 +347,21 @@ function playSoftFeedback(name: SoundName) {
       tone({ freq: 930, duration: 0.085, type: "triangle", gain: 0.075, delay: 0.04, release: 0.06 });
       break;
     case "type":
-      tone({ freq: 1220, duration: 0.018, type: "square", gain: 0.075, release: 0.01 });
+      playTypeNote("softFeedback", step);
+      break;
+    case "rain":
+      sounds.rain();
+      break;
+    case "wind":
+      sounds.wind();
+      break;
+    case "storm":
+      sounds.storm();
       break;
   }
 }
 
-function playPixel(name: SoundName) {
+function playPixel(name: SoundName, step?: number) {
   switch (name) {
     case "click":
       tone({ freq: 720, duration: 0.026, type: "square", gain: 0.14, release: 0.012 });
@@ -350,9 +397,9 @@ function playPixel(name: SoundName) {
       );
       break;
     case "error":
-      tone({ freq: 260, duration: 0.09, type: "sawtooth", gain: 0.105, release: 0.035 });
-      tone({ freq: 180, duration: 0.09, type: "sawtooth", gain: 0.09, delay: 0.07, release: 0.04 });
-      noiseBurst(0.07, 0.035, 900);
+      tone({ freq: 1046.5, duration: 0.028, type: "square", gain: 0.075, release: 0.012 });
+      tone({ freq: 783.99, duration: 0.032, type: "square", gain: 0.07, delay: 0.045, release: 0.014 });
+      tone({ freq: 622.25, duration: 0.04, type: "square", gain: 0.06, delay: 0.09, release: 0.018 });
       break;
     case "notify":
       tone({ freq: 1175, duration: 0.038, type: "square", gain: 0.085, release: 0.018 });
@@ -429,12 +476,27 @@ function playPixel(name: SoundName) {
       tone({ freq: 1560, duration: 0.04, type: "square", gain: 0.06, delay: 0.028, release: 0.018 });
       break;
     case "type":
-      tone({ freq: 1760, duration: 0.012, type: "square", gain: 0.055, release: 0.005 });
+      playTypeNote("pixel", step);
+      break;
+    case "rain":
+      noiseBurst(0.48, 0.045, 1800);
+      tone({ freq: 1800, duration: 0.018, type: "square", gain: 0.035, release: 0.008 });
+      tone({ freq: 2400, duration: 0.018, type: "square", gain: 0.03, delay: 0.075, release: 0.008 });
+      break;
+    case "wind":
+      noiseBurst(0.5, 0.035, 760);
+      tone({ freq: 240, duration: 0.04, type: "square", gain: 0.035, release: 0.018 });
+      tone({ freq: 320, duration: 0.05, type: "square", gain: 0.032, delay: 0.11, release: 0.02 });
+      break;
+    case "storm":
+      noiseBurst(0.55, 0.05, 900);
+      tone({ freq: 90, duration: 0.08, type: "square", gain: 0.07, release: 0.04 });
+      tone({ freq: 55, duration: 0.09, type: "square", gain: 0.055, delay: 0.07, release: 0.05 });
       break;
   }
 }
 
-function playClearChime(name: SoundName) {
+function playClearChime(name: SoundName, step?: number) {
   switch (name) {
     case "click":
       tone({ freq: 554.37, duration: 0.09, type: "sine", gain: 0.12, release: 0.07 });
@@ -469,8 +531,8 @@ function playClearChime(name: SoundName) {
       );
       break;
     case "error":
-      tone({ freq: 293.66, glideTo: 220, duration: 0.2, type: "triangle", gain: 0.09, release: 0.11 });
-      tone({ freq: 185, duration: 0.22, type: "triangle", gain: 0.075, delay: 0.11, release: 0.14 });
+      tone({ freq: 987.77, glideTo: 830.61, duration: 0.12, type: "sine", gain: 0.075, release: 0.08 });
+      tone({ freq: 659.25, duration: 0.16, type: "sine", gain: 0.065, delay: 0.09, release: 0.11 });
       break;
     case "notify":
       tone({ freq: 880, duration: 0.14, type: "sine", gain: 0.09, release: 0.11 });
@@ -545,7 +607,21 @@ function playClearChime(name: SoundName) {
       tone({ freq: 1318.51, duration: 0.12, type: "sine", gain: 0.06, delay: 0.05, release: 0.09 });
       break;
     case "type":
-      tone({ freq: 1568, duration: 0.018, type: "sine", gain: 0.045, release: 0.009 });
+      playTypeNote("clearChime", step);
+      break;
+    case "rain":
+      noiseBurst(0.7, 0.032, 3600);
+      tone({ freq: 1174.66, duration: 0.18, type: "sine", gain: 0.04, release: 0.14 });
+      tone({ freq: 1568, duration: 0.22, type: "sine", gain: 0.032, delay: 0.12, release: 0.18 });
+      break;
+    case "wind":
+      noiseBurst(0.76, 0.026, 1600);
+      tone({ freq: 392, glideTo: 587.33, duration: 0.48, type: "sine", gain: 0.042, release: 0.34 });
+      break;
+    case "storm":
+      noiseBurst(0.72, 0.04, 1400);
+      tone({ freq: 146.83, glideTo: 98, duration: 0.45, type: "triangle", gain: 0.065, release: 0.3 });
+      tone({ freq: 880, duration: 0.1, type: "sine", gain: 0.035, delay: 0.08, release: 0.08 });
       break;
   }
 }
