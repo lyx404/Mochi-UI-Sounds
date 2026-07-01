@@ -261,7 +261,7 @@ const SOUND_THEMES: Record<
 
 const THEME_ORDER: SoundThemeName[] = ["softFeedback", "pixel", "clearChime"];
 const AI_INSTALL_COMMAND =
-  "npx skills add lyx404/Mochi-UI-Sounds --skill mochi-ui-sounds --global -y --full-depth";
+  "npx skills add lyx404/Mochi-UI-Sounds --skill mochi-ui-sounds --agent '*' --global -y --full-depth --copy";
 const AI_INSTALL_STATS: InstallStat[] = [
   { value: `${LIBRARY.length}`, label: { zh: "组件音效", en: "component cues" } },
   { value: `${THEME_ORDER.length}`, label: { zh: "音色包", en: "sound packs" } },
@@ -574,14 +574,14 @@ function HeroInstallEntry({
 }) {
   const text = {
     zh: {
-      body: "安装成 Codex skill，让 AI 帮你把麻薯音效接入按钮、表单和反馈状态。",
+      body: "安装成通用 AI agent skill，让 Codex、Claude Code 等帮你接入麻薯音效。",
       copy: copied ? "已复制" : "复制",
-      aria: "复制 Codex skill 安装命令",
+      aria: "复制 AI agent skill 安装命令",
     },
     en: {
-      body: "Install as a Codex skill, then let AI wire Mochi sounds into buttons, forms and feedback states.",
+      body: "Install as a portable AI agent skill, then let Codex, Claude Code and others wire Mochi sounds into your app.",
       copy: copied ? "Copied" : "Copy",
-      aria: "Copy Codex skill install command",
+      aria: "Copy AI agent skill install command",
     },
   }[language];
 
