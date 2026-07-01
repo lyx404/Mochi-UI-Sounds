@@ -10,6 +10,7 @@ import {
   setSoundVolume,
   sourceForTheme,
   soundThemes,
+  unlockSound,
   type SoundName,
   type SoundThemeName,
 } from "@/lib/sounds";
@@ -484,7 +485,11 @@ function Index() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div
+      className="min-h-screen"
+      onPointerDownCapture={unlockSound}
+      onTouchStartCapture={unlockSound}
+    >
       <main className="mx-auto max-w-6xl px-5 pb-10">
         {/* Hero */}
         <section className="relative pt-12 pb-8 text-center">

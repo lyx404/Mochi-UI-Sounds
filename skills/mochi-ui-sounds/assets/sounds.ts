@@ -6,6 +6,7 @@
 
 let _ctx: AudioContext | null = null;
 let _volume = 0.8;
+let _unlocked = false;
 
 export function setSoundVolume(volume: number) {
   _volume = Math.min(1, Math.max(0, volume));
@@ -24,6 +25,20 @@ export function getCtx(): AudioContext {
   }
   if (_ctx.state === "suspended") void _ctx.resume();
   return _ctx;
+}
+
+export function unlockSound() {
+  if (typeof window === "undefined") return;
+  if (_unlocked && _ctx?.state === "running") return;
+
+  const ctx = getCtx();
+  const source = ctx.createBufferSource();
+  source.buffer = ctx.createBuffer(1, 1, ctx.sampleRate);
+  source.connect(ctx.destination);
+  source.start(0);
+  _unlocked = true;
+
+  if (ctx.state === "suspended") void ctx.resume();
 }
 
 type Wave = OscillatorType;
