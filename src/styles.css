@@ -205,6 +205,14 @@
   );
 }
 
+@utility scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @utility ai-leaf-bg {
   background-color: var(--color-leaf);
   background-image:

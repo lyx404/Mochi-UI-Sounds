@@ -594,7 +594,7 @@ function HeroInstallEntry({
               {text.body}
             </p>
             <div className="flex min-w-0 flex-col gap-2 rounded-2xl bg-white/70 p-2 sm:flex-row sm:items-center">
-              <code className="min-w-0 flex-1 whitespace-pre-wrap break-all px-3 py-2.5 font-mono text-sm font-black text-[var(--color-ink)] sm:overflow-x-auto sm:whitespace-nowrap sm:break-normal">
+              <code className="scrollbar-none min-w-0 flex-1 whitespace-pre-wrap break-all px-3 py-2.5 font-mono text-sm font-black text-[var(--color-ink)] sm:overflow-x-auto sm:whitespace-nowrap sm:break-normal">
                 <span className="mr-2 text-[var(--color-ink-muted)]">$</span>
                 {AI_INSTALL_COMMAND}
               </code>
