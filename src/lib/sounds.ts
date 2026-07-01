@@ -153,8 +153,8 @@ export const sounds = {
   type: () => tone({ freq: 1400, duration: 0.025, type: "square", gain: 0.1 }),
 
   slider: () => {
-    tone({ freq: 520, glideTo: 760, duration: 0.08, type: "triangle", gain: 0.1 });
-    noiseBurst(0.04, 0.025, 1800);
+    tone({ freq: 620, glideTo: 700, duration: 0.045, type: "triangle", gain: 0.035 });
+    noiseBurst(0.025, 0.008, 1600);
   },
 
   snap: () => {
@@ -278,8 +278,8 @@ function playSoftFeedback(name: SoundName) {
       noiseBurst(0.055, 0.025, 800);
       break;
     case "slider":
-      noiseBurst(0.075, 0.022, 1700);
-      tone({ freq: 420, glideTo: 620, duration: 0.11, type: "triangle", gain: 0.085, release: 0.065 });
+      noiseBurst(0.04, 0.008, 1500);
+      tone({ freq: 500, glideTo: 580, duration: 0.06, type: "triangle", gain: 0.032, release: 0.035 });
       break;
     case "snap":
       tone({ freq: 760, duration: 0.04, type: "triangle", gain: 0.105, release: 0.018 });
@@ -396,9 +396,7 @@ function playPixel(name: SoundName) {
       tone({ freq: 120, duration: 0.035, type: "square", gain: 0.06, delay: 0.14, release: 0.016 });
       break;
     case "slider":
-      noiseBurst(0.045, 0.03, 2200);
-      tone({ freq: 520, duration: 0.018, type: "square", gain: 0.055, release: 0.008 });
-      tone({ freq: 680, duration: 0.018, type: "square", gain: 0.05, delay: 0.035, release: 0.008 });
+      tone({ freq: 620, duration: 0.014, type: "square", gain: 0.025, release: 0.006 });
       break;
     case "snap":
       tone({ freq: 880, duration: 0.018, type: "square", gain: 0.095, release: 0.008 });
@@ -516,8 +514,8 @@ function playClearChime(name: SoundName) {
       noiseBurst(0.06, 0.02, 1000);
       break;
     case "slider":
-      noiseBurst(0.08, 0.018, 3600);
-      tone({ freq: 493.88, glideTo: 739.99, duration: 0.16, type: "sine", gain: 0.065, release: 0.1 });
+      noiseBurst(0.04, 0.006, 3200);
+      tone({ freq: 587.33, glideTo: 659.25, duration: 0.07, type: "sine", gain: 0.026, release: 0.045 });
       break;
     case "snap":
       tone({ freq: 987.77, duration: 0.05, type: "sine", gain: 0.08, release: 0.03 });

@@ -60,11 +60,11 @@
   --font-display: "Nunito", "Noto Sans SC", -apple-system, "PingFang SC", sans-serif;
   --font-sans: "Nunito", "Noto Sans SC", -apple-system, "PingFang SC", sans-serif;
 
-  --shadow-press: 0 5px 0 0 #bdaea0;
-  --shadow-press-hover: 0 6px 0 0 #bdaea0;
-  --shadow-press-active: 0 1px 0 0 #bdaea0;
-  --shadow-card: 0 2px 4px 0 rgba(61, 52, 40, 0.06);
-  --shadow-card-hover: 0 8px 24px rgba(114, 93, 66, 0.15);
+  --shadow-press: 0 3px 0 0 color-mix(in oklch, var(--border-strong) 50%, transparent);
+  --shadow-press-hover: 0 4px 0 0 color-mix(in oklch, var(--border-strong) 46%, transparent);
+  --shadow-press-active: 0 1px 0 0 color-mix(in oklch, var(--border-strong) 42%, transparent);
+  --shadow-card: 0 10px 28px rgba(114, 93, 66, 0.08);
+  --shadow-card-hover: 0 16px 36px rgba(114, 93, 66, 0.12);
 }
 
 :root {
@@ -100,8 +100,8 @@
   --destructive-foreground: oklch(1 0 0);
   --focus: oklch(0.86 0.18 90);                 /* #ffcc00 */
 
-  --border: oklch(0.78 0.03 75);                /* #c4b89e */
-  --border-strong: oklch(0.62 0.03 70);         /* #9f927d */
+  --border: oklch(0.82 0.024 78);               /* lighter warm line */
+  --border-strong: oklch(0.69 0.026 72);        /* softened cocoa */
   --input: oklch(0.78 0.03 75);
   --ring: oklch(0.86 0.18 90);
 
@@ -179,18 +179,19 @@
 
 @utility ai-card {
   background: var(--color-card);
-  border: 2px solid var(--color-border-strong);
-  border-radius: 20px;
+  border: 0;
+  border-radius: 18px;
+  box-shadow: var(--shadow-card);
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s;
   &:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     box-shadow: var(--shadow-card-hover);
   }
 }
 
 @utility ai-pill {
   border-radius: 50px;
-  border: 2px solid var(--color-border-strong);
+  border: 1px solid color-mix(in oklch, var(--color-border-strong) 74%, transparent);
   font-weight: 700;
   letter-spacing: 0.02em;
 }
