@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "mochi-ui-sounds",
+  "homepage": "https://github.com/lyx404/Mochi-UI-Sounds",
+  "items": [
+    {
+      "name": "mochi-sounds",
+      "type": "registry:lib",
+      "title": "Mochi UI Sounds",
+      "description": "A Web Audio UI sound library with soft feedback, pixel and clear chime themes.",
+      "files": [
+        {
+          "path": "src/lib/sounds.ts",
+          "type": "registry:lib",
+          "target": "@lib/sounds.ts"
+        }
+      ]
+    }
+  ]
+}
